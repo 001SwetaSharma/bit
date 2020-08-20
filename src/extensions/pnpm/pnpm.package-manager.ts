@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { install } from './lynx';
+import { install, resolveRemoteVersion } from './lynx';
 import { PackageManager, PackageManagerInstallOptions } from '../dependency-resolver';
 import { ComponentMap } from '../component/component-map';
 import {
@@ -10,6 +10,7 @@ import {
 } from '../dependency-resolver';
 import { PkgExtension } from '../pkg';
 import { Logger } from '../logger';
+import { PackageManagerResolveRemoteVersionOptions } from '../dependency-resolver/package-manager';
 
 const userHome = require('user-home');
 
@@ -66,5 +67,9 @@ export class PnpmPackageManager implements PackageManager {
       }
       return acc;
     }, {});
+  }
+
+  async resolveRemoteVersion(packageName: string, options: PackageManagerResolveRemoteVersionOptions): Promise<string> {
+    return resolveRemoteVersion(packageName);
   }
 }

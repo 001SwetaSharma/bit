@@ -5,7 +5,7 @@ import { LogBase, streamParser } from '@pnpm/logger';
 // import createFetcher from '@pnpm/tarball-fetcher';
 import { mutateModules, MutatedProject } from 'supi';
 // import createStore, { ResolveFunction, StoreController } from '@pnpm/package-store';
-import { StoreController } from '@pnpm/package-store';
+import { StoreController, WantedDependency, RequestPackageOptions } from '@pnpm/package-store';
 import { createNewStoreController } from '@pnpm/store-connection-manager';
 // TODO: this should be taken from - @pnpm/store-connection-manager
 // it's not taken from there since it's not exported.
@@ -13,6 +13,7 @@ import { createNewStoreController } from '@pnpm/store-connection-manager';
 import { CreateNewStoreControllerOptions } from '@pnpm/store-connection-manager/lib/createNewStoreController';
 
 import getConfig from '@pnpm/config';
+import { PackageManagerResolveRemoteVersionOptions } from '../dependency-resolver/package-manager';
 // import { createResolver } from './create-resolver';
 
 async function createStoreController(storeDir: string): Promise<StoreController> {
@@ -102,4 +103,21 @@ export async function install(rootPathToManifest, pathsToManifests, storeDir: st
     streamParser,
   });
   await mutateModules(packagesToBuild, opts);
+}
+
+export async function resolveRemoteVersion(
+  packageName: string,
+  storeDir: string,
+  fetchToCache = true,
+  update = true
+): Promise<string> {
+  const storeController = await createStoreController(storeDir);
+  const wantedDep: WantedDependency = {
+    alias: packageName,
+  };
+  const opts: RequestPackageOptions = {
+    skipFetch: !fetchToCache,
+    update,
+  };
+  const res = storeController.requestPackage(wantedDep, opts);
 }
